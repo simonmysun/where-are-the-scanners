@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
+<title>Where are the scanners</title>
 <style>
   body {
     margin: 0;
@@ -67,9 +68,22 @@
   .point {
     opacity: .6;
   }
+
+  .footer {
+    position: fixed;
+    z-index: 100;
+    bottom: 0;
+    right: 0;
+    color: #fff
+  }
 </style>
 
 <body>
+  <div class="footer">
+    Source code: <a
+      href="https://github.com/simonmysun/where-are-the-scanners">https://github.com/simonmysun/where-are-the-scanners
+    </a>&nbsp;
+  </div>
   <script src="./lib/d3.v4.min.js"></script>
   <script src="./lib/queue.v1.min.js"></script>
   <script src="./lib/topojson.v0.min.js"></script>
