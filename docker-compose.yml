@@ -1,0 +1,14 @@
+name: ip2geo
+
+services:
+  ip2geo:
+    container_name: ip2geo
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: no
+    volumes:
+      - ./dbip/:/app/dbip/:ro
+    environment:
+      - MMMDB_CITY_PATH=/app/dbip/dbip-city-lite-2024-06.mmdb
+      - MMMDB_ASN_PATH=/app/dbip/dbip-asn-lite-2024-06.mmdb

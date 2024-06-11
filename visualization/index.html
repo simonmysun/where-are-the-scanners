@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #000;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  svg {
+    height: 100%;
+    width: 100%;
+    outline: 1px solid #fff;
+  }
+
+  .land {
+    fill: white;
+    opacity: .3;
+    stroke: #4f2291;
+    stroke-opacity: 1;
+  }
+
+  .lines path {
+    fill: none;
+    stroke: #ff0000;
+    stroke-opacity: 0.2;
+    stroke-width: 1;
+    stroke-dasharray: 5, 3;
+    animation: dash 5s linear;
+    animation-iteration-count: infinite;
+  }
+
+  @keyframes dash {
+    to {
+      stroke-dashoffset: 300;
+    }
+  }
+
+  circle {
+    stroke: #4f2291;
+  }
+
+  .graticule {
+    fill: none;
+    stroke: #8f59df;
+    stroke-width: .5;
+    opacity: .2;
+  }
+
+  .labels {
+    font: 8px sans-serif;
+    fill: #fff;
+    opacity: 1;
+    cursor: pointer;
+  }
+
+  .noclicks {
+    pointer-events: none;
+  }
+
+  .point {
+    opacity: .6;
+  }
+</style>
+
+<body>
+  <script src="./lib/d3.v4.min.js"></script>
+  <script src="./lib/queue.v1.min.js"></script>
+  <script src="./lib/topojson.v0.min.js"></script>
+  <script src="./lib/versor.js"></script>
+
+  <script>
+
+    const cyrb53 = (str, seed = 0) => {
+      let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
+      for (let i = 0, ch; i < str.length; i++) {
+        ch = str.charCodeAt(i);
+        h1 = Math.imul(h1 ^ ch, 2654435761);
+        h2 = Math.imul(h2 ^ ch, 1597334677);
+      }
+      h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507);
+      h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+      h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507);
+      h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+
+      return 4294967296 * (2097151 & h2) + (h1 >>> 0);
+    };
+
+    const stringToColour = (str) => {
+      return `hsl(${cyrb53(str) % 360}, 100%, 50%)`;
+    }
+
+    var width = 960,
+      height = 960;
+
+    var proj = d3.geoOrthographic()
+      .scale(400)
+      .translate([width / 2, height / 2])
+      // change this to 180 for transparent globe
+      .clipAngle(90);
+
+
+    var path = d3.geoPath().projection(proj).pointRadius(1.5);
+
+    var graticule = d3.geoGraticule();
+
+    var target = [11.0767, 49.4521];
+
+    var time = Date.now();
+    var rotate = [0, -30];
+    var velocity = [.005, -0];
+    let zoomLevel = 1;
+
+    var lineToTarget = function (d) {
+      return path({ "type": "LineString", "coordinates": [target, d.geometry.coordinates] });
+    }
+
+    function stripWhitespace(str) {
+      return str.replace(" ", "");
+    }
+
+    var svg = d3.select("body").append("svg")
+      .attr("width", width)
+      .attr("height", height)
+      .attr("viewBox", `0 0 ${width} ${height}`);
+
+    svg.call(d3.drag()
+      .on("start", dragstarted)
+      .on("drag", dragged));
+    svg.call(d3.zoom()
+      .scaleExtent([0.5, Infinity])
+      .translateExtent([[0, 0], [width, height]])
+      .extent([[0, 0], [width, height]]).on("zoom", function () {
+        zoomLevel = d3.event.transform.k;
+        svg.selectAll('.globe')
+          .attr("transform", d3.event.transform);
+        var centerPos = proj.invert([width / 2, height / 2]);
+        position_labels();
+      }));
+
+    queue()
+      .defer(d3.json, "./lib/land-110m.json")
+      .defer(d3.json, "./data.json")
+      .await(ready);
+
+    function ready(error, world, places) {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has('protocol')) {
+        const allowedProtocols = urlParams.get('protocol').split(',');
+        places.features = places.features.filter((d) => allowedProtocols.includes(d.properties.protocol));
+      }
+      const len = places.features.length;
+      let maxc = 0;
+      for (var i = 0; i < len; i++) {
+        maxc = Math.max(maxc, places.features[i].properties.count);
+      }
+      for (var i = 0; i < len; i++) {
+        places.features[i].properties.strokeWidth = places.features[i].properties.count / maxc * 5 + 1;
+        places.features[i].properties.hash = cyrb53(places.features[i].properties.source_ip);
+      }
+      globe = svg.append("g").attr("class", "globe");
+      globe.append("circle")
+        .attr("cx", width / 2)
+        .attr("cy", height / 2)
+        .attr("r", proj.scale())
+        .attr("class", "noclicks")
+        .attr("fill", "#001");
+
+      globe.append("path")
+        .datum(topojson.object(world, world.objects.land))
+        .attr("class", "land")
+        .attr("d", path);
+
+      globe.append("path")
+        .datum(graticule)
+        .attr("class", "graticule noclicks")
+        .attr("d", path);
+
+      globe.append("g").attr("class", "points")
+        .selectAll("text").data(places.features)
+        .enter().append("path")
+        .attr("class", "point")
+        .attr("d", path);
+
+      globe.append("g").attr("class", "lines")
+        .selectAll(".lines").data(places.features)
+        .enter().append("path")
+        .attr("class", d => `city-${stripWhitespace(d.properties.city).replace(/(^-\d-|^\d|^-\d|^--)/, 'a$1').replace(/[\W]/g, '-')} lines`)
+        .attr("d", d => lineToTarget(d))
+        .style("stroke", d => stringToColour(d.properties.protocol))
+        .style("stroke-width", d => d.properties.strokeWidth);
+
+
+      globe.append("g").attr("class", "labels")
+        .selectAll("text").data(places.features)
+        .enter().append("text")
+        .attr("class", "label")
+        .text(d => d.properties.city)
+        .on("mouseover", (d) => {
+          d3.select("g.info").select("text.distance").text(`${d.properties.city}, ${d.properties.country}, ${d.properties.continent}. protocol=${d.properties.protocol},ip=${d.properties.source_ip},cnt=${d.properties.count},asn=${d.properties.asn}`);
+          var city = stripWhitespace(d.properties.city).replace(/(^-\d-|^\d|^-\d|^--)/, 'a$1').replace(/[\W]/g, '-');
+          d3.select("g.lines").select(`.city-${city}`).style("stroke-opacity", 1)
+        })
+        .on("mouseout", (d) => {
+          var city = stripWhitespace(d.properties.city).replace(/(^-\d-|^\d|^-\d|^--)/, 'a$1').replace(/[\W]/g, '-');
+          d3.select("g.lines").select(`.city-${city}`).style("stroke-opacity", 0.2)
+          d3.select("g.info").select("text.distance").text("Hover over a location");
+        });
+
+      position_labels();
+
+      svg.append("g").attr("class", "info")
+        .append("text")
+        .attr("class", "distance")
+        .attr("x", width / 20)
+        .attr("y", height * 0.9)
+        .attr("text-anchor", "start")
+        .style("font-size", "12px")
+        .style("fill", "#fff")
+        .text("Hover over a location");
+
+      refresh();
+
+      spin();
+    }
+
+
+    function position_labels() {
+      var centerPos = proj.invert([width / 2, height / 2]);
+
+      svg.selectAll(".label")
+        .attr("text-anchor", (d) => {
+          var x = proj(d.geometry.coordinates)[0];
+          return "middle";
+        })
+        .attr("font-size", 8 / zoomLevel)
+        .attr("transform", (d) => {
+          var loc = proj(d.geometry.coordinates),
+            x = loc[0],
+            y = loc[1];
+          var offsetX = Math.sin(d.properties.hash % 360 * Math.PI / 180) * (Math.log(zoomLevel)) / 2;
+          var offsetY = Math.cos(d.properties.hash % 360 * Math.PI / 180) * (Math.log(zoomLevel)) / 2;
+          return "translate(" + (x + offsetX) + "," + (y + offsetY) + ")";
+        })
+        .style("display", (d) => {
+          var d = d3.geoDistance(d.geometry.coordinates, centerPos);
+          return (d > 1.57) ? 'none' : 'inline';
+        })
+
+    }
+
+    function refresh() {
+      svg.selectAll(".land").attr("d", path);
+      svg.selectAll(".countries path").attr("d", path);
+      svg.selectAll(".graticule").attr("d", path);
+      svg.selectAll(".point").attr("d", path);
+      svg.selectAll(".lines").attr("d", (d) => { if (d) { return lineToTarget(d); } });
+      position_labels();
+    }
+
+
+    var timer;
+
+    const spinFn = function () {
+      var dt = Date.now() - time;
+
+      proj.rotate([rotate[0] + velocity[0] * dt, rotate[1] + velocity[1] * dt]);
+
+      refresh();
+    };
+
+    function spin() {
+      timer = d3.timer(spinFn);
+    }
+
+    function dragstarted() {
+      timer.stop();
+      v0 = versor.cartesian(proj.invert(d3.mouse(this)));
+      r0 = proj.rotate();
+      q0 = versor(r0);
+    }
+
+    function dragged() {
+      var v1 = versor.cartesian(proj.rotate(r0).invert(d3.mouse(this)));
+      var delta = versor.delta(v0, v1, zoomLevel);
+      var q1 = versor.multiply(q0, delta);
+      var r1 = versor.rotation(q1);
+      proj.rotate(r1);
+      refresh();
+    }
+
+  </script>
