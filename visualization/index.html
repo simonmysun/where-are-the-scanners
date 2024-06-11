@@ -90,6 +90,7 @@
   <script src="./lib/versor.js"></script>
 
   <script>
+    const urlParams = new URLSearchParams(window.location.search);
 
     const cyrb53 = (str, seed = 0) => {
       let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
@@ -160,11 +161,10 @@
 
     queue()
       .defer(d3.json, "./lib/land-110m.json")
-      .defer(d3.json, "./data.json")
+      .defer(d3.json, urlParams.has('data') ? urlParams.get('data') : "./data.json")
       .await(ready);
 
     function ready(error, world, places) {
-      const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.has('protocol')) {
         const allowedProtocols = urlParams.get('protocol').split(',');
         places.features = places.features.filter((d) => allowedProtocols.includes(d.properties.protocol));
