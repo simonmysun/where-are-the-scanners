@@ -16,18 +16,6 @@ with geoip2.database.Reader(mmdb_city_path) as mmdb_city, geoip2.database.Reader
     timestamp = line[0]
     target_ip = line[1]
     source_ip = line[2]
-    if '.' in source_ip:
-      source_ip = source_ip.split('.')
-      source_ip[-1] = 'xxx'
-      source_ip = '.'.join(source_ip)
-    else:
-      components = source_ip.split(':')
-      if len(components) < 8:
-        expanded_address = source_ip.replace('::', ':' + ':'.join(['0'] * (8 - len(components) + 1 )) + ':')
-        components = expanded_address.split(':')
-      components[-1] = 'xxxx'
-      covered_address = ':'.join([comp.lstrip('0') or '0' for comp in components])
-      source_ip = covered_address
     protocol = line[3]
     mmdb_city_response = None
     try:
@@ -40,6 +28,18 @@ with geoip2.database.Reader(mmdb_city_path) as mmdb_city, geoip2.database.Reader
       mmdb_asn_response = mmdb_asn.asn(source_ip)
     except Exception as e:
       mmdb_asn_response = 'Unknown'
+    if '.' in source_ip:
+      source_ip = source_ip.split('.')
+      source_ip[-1] = 'xxx'
+      source_ip = '.'.join(source_ip)
+    else:
+      components = source_ip.split(':')
+      if len(components) < 8:
+        expanded_address = source_ip.replace('::', ':' + ':'.join(['0'] * (8 - len(components) + 1 )) + ':')
+        components = expanded_address.split(':')
+      components[-1] = 'xxxx'
+      covered_address = ':'.join([comp.lstrip('0') or '0' for comp in components])
+      source_ip = covered_address
     if (source_ip, protocol) not in scanners:
       scanners[(source_ip, protocol)] = {
         "count": 1,
