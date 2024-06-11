@@ -2,6 +2,12 @@
 
 This tool visualizes the location of the scanners. 
 
+![Screenshot](https://raw.githubusercontent.com/simonmysun/where-are-the-scanners/master/visualization/screenshots.png)
+
+## See it in action
+
+https://makelove.expert/tmp/where-are-the-scanners/?protocol=ssh%2Cnginx
+
 ## Usage
 
 ### Getting IP addresses of scanners
