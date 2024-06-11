@@ -39,13 +39,13 @@ Alternatively, you can use docker to run the script
 
 ```bash
 docker build -t ip2geo .
-docker run --rm -t ip2geo < ip.csv > data.json
+docker run --rm -t ip2geo -e MMMDB_CITY_PATH=/path/to/dbip-city.mmdb -e MMMDB_ASN_PATH=/path/to/dbip-asn.mmdb < ip.csv > data.json
 ```
 
 Or use docker-compose
 
 ```bash
-docker compose build .
+docker compose build
 docker compose run -T ip2geo < ip.csv > data.json
 ```
 
