@@ -2,7 +2,7 @@
 
 This tool visualizes the location of the scanners. 
 
-![Screenshot](https://raw.githubusercontent.com/simonmysun/where-are-the-scanners/master/visualization/screenshots.png)
+![Screenshot](https://raw.githubusercontent.com/simonmysun/where-are-the-scanners/master/visualization/screenshot.png)
 
 ## See it in action
 
