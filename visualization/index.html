@@ -32,9 +32,7 @@
     stroke: #ff0000;
     stroke-opacity: 0.6;
     stroke-width: 1;
-    stroke-dasharray: 5, 3;
-    animation: dash 5s linear;
-    animation-iteration-count: infinite;
+    stroke-linecap: round;
   }
 
   @keyframes dash {
@@ -215,7 +213,9 @@
         .attr("class", d => `city-${stripWhitespace(d.properties.city).replace(/(^-\d-|^\d|^-\d|^--)/, 'a$1').replace(/[\W]/g, '-')} lines`)
         .attr("d", d => lineToTarget(d))
         .style("stroke", d => stringToColour(d.properties.protocol))
-        .style("stroke-width", d => d.properties.scaledCount / 4)
+        .style("stroke-width", d => Math.sqrt(d.properties.scaledCount))
+        .style("stroke-dasharray", d => `${Math.floor(d.properties.scaledCount)} 10`)
+        .style("stroke-dashoffset", d => `${Math.random() * 30}`)
         .style("animation", d => `${18 - d.properties.scaledCount}s linear 0s infinite normal none running dash`);
 
 
