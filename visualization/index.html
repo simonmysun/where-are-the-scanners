@@ -30,7 +30,7 @@
   .lines path {
     fill: none;
     stroke: #ff0000;
-    stroke-opacity: 0.6;
+    stroke-opacity: 0.3;
     stroke-width: 1;
     stroke-linecap: round;
   }
@@ -210,7 +210,7 @@
       globe.append("g").attr("class", "lines")
         .selectAll(".lines").data(places.features)
         .enter().append("path")
-        .attr("class", d => `city-${stripWhitespace(d.properties.city).replace(/(^-\d-|^\d|^-\d|^--)/, 'a$1').replace(/[\W]/g, '-')} lines`)
+        .attr("class", d => `source_ip-${stripWhitespace(d.properties.source_ip).replace(/[\W]/g, '-')} lines`)
         .attr("d", d => lineToTarget(d))
         .style("stroke", d => stringToColour(d.properties.protocol))
         .style("stroke-width", d => Math.sqrt(d.properties.scaledCount))
@@ -226,12 +226,12 @@
         .text(d => d.properties.city)
         .on("mouseover", (d) => {
           d3.select("g.info").select("text.distance").text(`${d.properties.city}, ${d.properties.country}, ${d.properties.continent}. protocol=${d.properties.protocol},ip=${d.properties.source_ip},cnt=${d.properties.count},asn=${d.properties.asn}`);
-          var city = stripWhitespace(d.properties.city).replace(/(^-\d-|^\d|^-\d|^--)/, 'a$1').replace(/[\W]/g, '-');
-          d3.select("g.lines").select(`.city-${city}`).style("stroke-opacity", 1)
+          var source_ip = stripWhitespace(d.properties.source_ip).replace(/[\W]/g, '-');
+          d3.select("g.lines").select(`.source_ip-${source_ip}`).style("stroke-opacity", 1)
         })
         .on("mouseout", (d) => {
-          var city = stripWhitespace(d.properties.city).replace(/(^-\d-|^\d|^-\d|^--)/, 'a$1').replace(/[\W]/g, '-');
-          d3.select("g.lines").select(`.city-${city}`).style("stroke-opacity", 0.6)
+          var source_ip = stripWhitespace(d.properties.source_ip).replace(/[\W]/g, '-');
+          d3.select("g.lines").select(`.source_ip-${source_ip}`).style("stroke-opacity", 0.3)
           d3.select("g.info").select("text.distance").text("Hover over a location");
         });
 
