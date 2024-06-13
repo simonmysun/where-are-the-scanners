@@ -4,6 +4,8 @@ SINCE_MINUTES_AGO="${SINCE_MINUTES_AGO:-10}";
 LOG_PATH='/var/log/services/reverse-proxy/nginx/*';
 export TZ='Europe/Berlin';
 
+host=`uname -n`;
+
 DATE_SINCE=$(date --date "-${SINCE_MINUTES_AGO} min" '+%s');
 cat $LOG_PATH | grep -v '\[error\]' | {
   while read -r line; do
