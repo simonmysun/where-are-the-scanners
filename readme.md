@@ -61,7 +61,7 @@ Edit MMDB paths and volume binds in `docker-compose.yml` if necessary.
 
 ## License
 
-Unless otherwise specified, all files in this repository are licensed under the MIT license. See the LICENSE file for more information.
+Unless otherwise specified, all files in this repository are licensed under the MIT license. See the [LICENSE](./LICENSE) file for more information.
 
 - `./visualization/index.html` along with related libraries are modified from https://gist.github.com/tlfrd/df1f1f705c7940a6a7c0dca47041fec8 which is licensed with MIT.
-- `./visualization/land-110m.json` is from https://github.com/topojson/world-atlas
+- `./visualization/land-110m.json` is from https://github.com/topojson/world-atlas which is licensed with ISC. 
