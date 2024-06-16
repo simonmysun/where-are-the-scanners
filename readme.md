@@ -59,6 +59,11 @@ Edit MMDB paths and volume binds in `docker-compose.yml` if necessary.
 - use query parameters to filter the data, e.g. https://makelove.expert/tmp/where-are-the-scanners/?protocol=ssh or https://makelove.expert/tmp/where-are-the-scanners/?protocol=ssh,traefik
 - optionally you can specify the path to the data file with `data` query parameter, e.g. https://makelove.expert/tmp/where-are-the-scanners/?protocol=ssh,nginx&data=data.large.json
 
+## Related discussions (not directly related to this repository)
+
+- https://news.ycombinator.com/item?id=40164337
+- https://news.ycombinator.com/item?id=40694768
+
 ## License
 
 Unless otherwise specified, all files in this repository are licensed under the MIT license. See the [LICENSE](./LICENSE) file for more information.
