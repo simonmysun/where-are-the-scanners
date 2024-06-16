@@ -57,7 +57,7 @@ Edit MMDB paths and volume binds in `docker-compose.yml` if necessary.
 - host the directory with a web server, e.g. `python3 -m http.server 8000`
 - open the web page in your browser
 - use query parameters to filter the data, e.g. https://makelove.expert/tmp/where-are-the-scanners/?protocol=ssh or https://makelove.expert/tmp/where-are-the-scanners/?protocol=ssh,traefik
-- optionally you can specify the path to the data file with `data` query parameter, e.g. https://makelove.expert/tmp/where-are-the-scanners/?protocol=ssh,nginx&data=data.large.json
+- optionally you can specify the path to the data file with `data` query parameter, e.g. https://makelove.expert/tmp/where-are-the-scanners/?protocol=ssh,nginx&data=data.json
 
 ## Related discussions (not directly related to this repository)
 
