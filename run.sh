@@ -1,12 +1,10 @@
 #!/usr/bin/env bash
 
-: "${SINCE_MINUTES_AGO:=10}";
-: "${HOST_IP:=0.0.0.0}";
-
 export TZ='Europe/Berlin';
 
 DATE=$(date +%F)
 
+export SINCE_MINUTES_AGO=1440
 export HOST_IP=`curl --silent --show-error ifconfig.co`
 echo "HOST_IP: $HOST_IP"
 
