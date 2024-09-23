@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 
-SINCE_MINUTES_AGO="${SINCE_MINUTES_AGO:-10}";
+: "${SINCE_MINUTES_AGO:=10}";
+: "${HOST_IP:=0.0.0.0}";
 LOG_PATH='/var/log/services/reverse-proxy/nginx/*';
 export TZ='Europe/Berlin';
-
-host=`uname -n`;
 
 DATE_SINCE=$(date --date "-${SINCE_MINUTES_AGO} min" '+%s');
 cat $LOG_PATH | grep -v '\[error\]' | {
@@ -20,6 +19,6 @@ cat $LOG_PATH | grep -v '\[error\]' | {
     fi
     source_ip=$(echo "$line" | awk '{print $NF}' | tr -d '"');
     service=nginx;
-    echo "$epoch_time,$host,$source_ip,$service";
+    echo "$epoch_time,$HOST_IP,$source_ip,$service";
   done
 };

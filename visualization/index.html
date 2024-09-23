@@ -95,6 +95,8 @@
   <script src="./lib/versor.js"></script>
 
   <script>
+    var initialView = [11.0767, 49.4521];
+
     const urlParams = new URLSearchParams(window.location.search);
 
     const cyrb53 = (str, seed = 0) => {
@@ -130,15 +132,13 @@
 
     var graticule = d3.geoGraticule();
 
-    var target = [11.0767, 49.4521];
-
     var time = Date.now();
     var rotate = [0, -30];
     var velocity = [.005, -0];
     let zoomLevel = 1;
 
     var lineToTarget = function (d) {
-      return path({ "type": "LineString", "coordinates": [target, d.geometry.coordinates] });
+      return path({ "type": "LineString", "coordinates": [d.source_geometry.coordinates, d.target_geometry.coordinates] });
     }
 
     function stripWhitespace(str) {
@@ -258,12 +258,12 @@
 
       svg.selectAll(".label")
         .attr("text-anchor", (d) => {
-          var x = proj(d.geometry.coordinates)[0];
+          var x = proj(d.source_geometry.coordinates)[0];
           return "middle";
         })
         .attr("font-size", 8 / zoomLevel)
         .attr("transform", (d) => {
-          var loc = proj(d.geometry.coordinates),
+          var loc = proj(d.source_geometry.coordinates),
             x = loc[0],
             y = loc[1];
           var offsetX = Math.sin(d.properties.hash % 360 * Math.PI / 180) * (Math.log(zoomLevel)) / 2;
@@ -271,7 +271,7 @@
           return "translate(" + (x + offsetX) + "," + (y + offsetY) + ")";
         })
         .style("display", (d) => {
-          var d = d3.geoDistance(d.geometry.coordinates, centerPos);
+          var d = d3.geoDistance(d.source_geometry.coordinates, centerPos);
           return (d > 1.57) ? 'none' : 'inline';
         })
 
