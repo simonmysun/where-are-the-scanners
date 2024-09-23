@@ -138,7 +138,7 @@
     let zoomLevel = 1;
 
     var lineToTarget = function (d) {
-      return path({ "type": "LineString", "coordinates": [d.source_geometry.coordinates, d.target_geometry.coordinates] });
+      return path({ "type": "LineString", "coordinates": [d.target_geometry.coordinates, d.source_geometry.coordinates] });
     }
 
     function stripWhitespace(str) {
@@ -173,6 +173,10 @@
       if (urlParams.has('protocol')) {
         const allowedProtocols = urlParams.get('protocol').split(',');
         places.features = places.features.filter((d) => allowedProtocols.includes(d.properties.protocol));
+      }
+      if (urlParams.has('target')) {
+        const targetIP = urlParams.get('target');
+        places.features = places.features.filter((d) => d.properties.target_ip === targetIP);
       }
       const len = places.features.length;
       let maxc = 0;
