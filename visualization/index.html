@@ -178,6 +178,10 @@
         const targetIP = urlParams.get('target');
         places.features = places.features.filter((d) => d.properties.target_ip === targetIP);
       }
+      if (urlParams.has('min_cnt')) {
+        const minCnt = parseInt(urlParams.get('min_cnt'));
+        places.features = places.features.filter((d) => d.properties.count >= minCnt);
+      }
       const len = places.features.length;
       let maxc = 0;
       for (var i = 0; i < len; i++) {

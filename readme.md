@@ -6,7 +6,7 @@ This tool visualizes the location of the scanners.
 
 ## See it in action
 
-https://makelove.expert/tmp/where-are-the-scanners/?protocol=ssh%2Cnginx
+https://makelove.expert/tmp/where-are-the-scanners/?protocol=ssh%2Cnginx&target=2a03:4000:64:99:0:0:0:xxxx&min_cnt=2
 
 ## Usage
 
